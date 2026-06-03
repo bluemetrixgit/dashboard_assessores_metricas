@@ -20,9 +20,14 @@ def atualizar_dados():
         st.warning(f"Não foi possível rodar o ETL em tempo real, usando cache local. Erro: {e}")
 
 atualizar_dados()
-
 @st.cache_data
 def carregar_base():
+    import os
+    # Se o arquivo não existir (como acontece na primeira vez que sobe na nuvem)
+    if not os.path.exists("historico_operacional.csv"):
+        st.info("🔄 Primeira inicialização: Buscando dados diretamente no Pipefy...")
+        run_etl() # Roda a extração para criar o arquivo CSV do zero
+        
     df = pd.read_csv("historico_operacional.csv")
     df["entrou_em"] = pd.to_datetime(df["entrou_em"])
     return df
